@@ -30,6 +30,11 @@
     #warning "Wire library does not support transactions exceeding 32 bytes"
   #endif
 
+struct cmd_param {
+  int  argc;              // parameter_cnt(max 5)
+  char argv[5][20];       // parameter string
+};
+
   /**
    * @brief Compares two null-terminated byte strings lexicographically.
    *
@@ -49,7 +54,7 @@
   namespace TerminalCommander {
     namespace TerminalCommanderTypes {
       /** @brief User char* callback lambda expression that does not capture local variables */
-      typedef void (user_callback_char_fn_t)(char*, size_t);
+      typedef void (user_callback_char_fn_t)(struct cmd_param);
 
       // alt: the following works for lambda expressions that capture local variables
       // e.g. [&](){}, but requires #include <functional> which is not supported for AVR cores
@@ -222,6 +227,9 @@
 
         /** Total length in char and without spaces of buffer after command delimiter character*/
         uint8_t argsLength;
+        
+        /* after parsed command parameters */
+        struct cmd_param cmd_param_value;
 
         /** Index of current character in incoming serial rx data array */
         uint8_t index;
@@ -535,6 +543,8 @@
          * @returns void
          */
         void printTwoWireRegister(uint8_t i2c_register);
+        
+        int parseCmd(const char* input, struct cmd_param* result);
     };
   }
 #endif
